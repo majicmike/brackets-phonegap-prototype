@@ -20,9 +20,11 @@ var PhoneGapBuild = function () {
 
     function fire(event) {
         var i = 0;
+        
         if (typeof event === "string") {
             event = { type: event };
         }
+        
         if (!event.target) {
             event.target = self;
         }
@@ -56,10 +58,12 @@ var PhoneGapBuild = function () {
     function areAllOSComplete(statusObj) {
         var os = "";
         for (os in statusObj) {
-            if (statusObj[os] !== "complete") {
+            console.log(statusObj[os], statusObj[os] !== "complete");
+            if (statusObj[os] !== null && statusObj[os] !== "complete") {
                 return false;
             }
         }
+        console.log("RETURNING TRUE");
         return true;
     }
 
@@ -76,9 +80,6 @@ var PhoneGapBuild = function () {
 
     function parseProjectInfo(response) {
         try {
-            console.log("Getting Project details");
-            console.log(response);
-
             response.complete = areAllOSComplete(response.status);
             response.incompleteCount = incompleteCount(response.status);
             var myEvent = new CustomEvent("statusresponse", {detail: response});
@@ -86,12 +87,11 @@ var PhoneGapBuild = function () {
 
             var functionCall = function () { self.getProjectStatus(response.id); };
 
-            if (areAllOSComplete(response.status) === false) {
-                console.log("Still building");
-                timers.push(setTimeout(functionCall, 1000));
+            if (areAllOSComplete(response.status)) {
+                console.log("all OSes are complete");
             } else {
-                console.log("Complete");
-                timers.push(setTimeout(functionCall, 20000));
+                console.log("all OSes are NOT complete");
+                timers.push(setTimeout(functionCall, 2000));
             }
         } catch (an_exception) {
             console.log(response);
@@ -121,6 +121,7 @@ var PhoneGapBuild = function () {
     }
 
     function getProjectStatus(id) {
+        console.log("getProjectStatus");
         $.ajax({
             url: URL_LIST + "/" + id,
             success: parseProjectInfo,
@@ -135,17 +136,13 @@ var PhoneGapBuild = function () {
     function setToken(token) {
         self.token = token;
         localStorage.setItem(prefix + 'token', token);
-        console.log("Token set to: " + token);
     }
 
     function setAssociation(fullPath, id) {
         localStorage.setItem(prefix + fullPath, id);
-        console.log("Projects Associated: " + id + " - " + fullPath);
     }
 
     function getAssociation(fullPath) {
-        console.log("Projects requested: " + fullPath);
-        console.log(localStorage);
         return localStorage.getItem(prefix + fullPath);
     }
 
@@ -156,17 +153,12 @@ var PhoneGapBuild = function () {
     function initialize() {
         var token = localStorage.getItem(prefix + "token");
         var tokenDefined = false;
-
-        console.log("Initalizing");
-        console.log(token);
         if ((token === null) || (token === 'null')) {
             console.log("Token is null");
             self.initialized = true;
         } else if (token === "") {
-            console.log("Token is Blank");
             self.initialized = true;
         } else {
-            console.log("Token is defined. " + token);
             tokenDefined = true;
             setToken(token);
             self.initialized = true;
@@ -190,8 +182,6 @@ var PhoneGapBuild = function () {
 	}
 
     function handleLoginSuccess(response, status, jqXHR) {
-        console.log("Token Retreived");
-        console.log(response);
         setToken(response.token);
 
         var myEvent = new CustomEvent("login", {});
@@ -199,7 +189,6 @@ var PhoneGapBuild = function () {
     }
 
 	function login(username, password) {
-        console.log("login Called");
 		$.ajax({
             url: URL_TOKEN,
             type: "post",
@@ -214,7 +203,6 @@ var PhoneGapBuild = function () {
 	}
 
     function handleRebuildSuccess(response, status, jqXHR) {
-        console.log('Rebuild Requested');
         var myEvent = new CustomEvent("rebuildrequested", {});
         fire(myEvent);
 
@@ -237,7 +225,6 @@ var PhoneGapBuild = function () {
 
 
     function logout() {
-        console.log("Logout");
         setToken("");
         self.tokenDefined = false;
         self.initialized = false;
@@ -248,10 +235,7 @@ var PhoneGapBuild = function () {
     }
 
     function handleListSuccess(response, status, jqXHR) {
-        console.log("List Retreived");
-        console.log(response.apps);
         setList(response.apps);
-
         var myEvent = new CustomEvent("listloaded", {detail: {list: response.apps}});
         fire(myEvent);
     }
