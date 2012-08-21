@@ -256,6 +256,10 @@ var PhoneGapBuild = function () {
         });
     }
 
+    function getQRCode(link) {
+        return 'https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=' + link + '&chld=L|1&choe=UTF-8';
+    }
+
     function killTimers() {
         var timer = "";
         console.log("Timer Kill has been invoked.  Beware timers. ");
@@ -285,5 +289,6 @@ var PhoneGapBuild = function () {
     this.getProjectStatus = getProjectStatus;
     this.killTimers = killTimers;
     this.qualifyLink = qualifyLink;
+    this.getQRCode = getQRCode;
 
 };

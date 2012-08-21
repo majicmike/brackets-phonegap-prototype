@@ -357,7 +357,13 @@ define(function (require, exports, module) {
 
         for (propertyname in project.status) {
             if (project.status.hasOwnProperty(propertyname)) {
-                subtable += '<tr><th>' + propertyname + '</th><td>' + project.status[propertyname] + '</td></tr>';
+                var status = project.status[propertyname];
+                // Display the QRCode for completed builds
+                if (project.download.hasOwnProperty(propertyname)) {
+                    var link = phonegapbuild.qualifyLink(project.download[propertyname]);
+                    status = '<img src="' + phonegapbuild.getQRCode(link) + '" />';
+                }
+                subtable += '<tr><th>' + propertyname + '</th><td>' + status + '</td></tr>';
             }
         }
         subtable += '</table>';
