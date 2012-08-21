@@ -344,6 +344,10 @@ define(function (require, exports, module) {
     function handlePGStatusResponse(e) {
         var project = e.detail;
         var propertyname;
+        
+        var projectTitleLink = '<a target="_blank" href="' +
+            phonegapbuild.qualifyLink("/apps/" + project.id) +
+            '">' + project.title + '</a>';
 
         var subtable = '<table class="condensed-table">';
 
@@ -354,7 +358,7 @@ define(function (require, exports, module) {
         }
         subtable += '</table>';
 
-        $("#pg-project-title").text(project.title);
+        $("#pg-project-title").html(projectTitleLink);
         $("#pg-project-description").text(project.description);
         $("#pg-project-status").html(subtable);
 

@@ -149,6 +149,10 @@ var PhoneGapBuild = function () {
     function removeAssociation(fullPath) {
         localStorage.removeItem(prefix + fullPath);
     }
+    
+    function qualifyLink(link) {
+        return URL_BASE + link;
+    }
 
     function initialize() {
         var token = localStorage.getItem(prefix + "token");
@@ -280,5 +284,6 @@ var PhoneGapBuild = function () {
     this.removeAssociation = removeAssociation;
     this.getProjectStatus = getProjectStatus;
     this.killTimers = killTimers;
+    this.qualifyLink = qualifyLink;
 
 };
