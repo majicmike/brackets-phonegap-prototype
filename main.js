@@ -77,6 +77,7 @@ define(function (require, exports, module) {
             }
         }
         $('#pg-interface').css("height", height);
+        $('#pg-interface').css("overflow-y", "scroll");
         EditorManager.resizeEditor();
     }
 
