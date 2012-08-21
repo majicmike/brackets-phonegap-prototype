@@ -513,6 +513,15 @@ define(function (require, exports, module) {
             checkAssociation();
         }
     }
+    
+    function openProjectForId(id) {
+        var localPath = phonegapbuild.getLocalPathForId(id);
+        if (localPath) {
+            return ProjectManager.openProject(localPath);
+        } else {
+            return null;
+        }
+    }
 
     CommandManager.register("Associate with PhoneGap Build", PG_PROJECT_ASSOCIATION, handlePGAssociate);
 

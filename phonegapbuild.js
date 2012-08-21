@@ -140,14 +140,20 @@ var PhoneGapBuild = function () {
 
     function setAssociation(fullPath, id) {
         localStorage.setItem(prefix + fullPath, id);
+        localStorage.setItem(prefix + id, fullPath);
     }
 
     function getAssociation(fullPath) {
         return localStorage.getItem(prefix + fullPath);
     }
+    
+    function getLocalPathForId(id) {
+        return localStorage.getItem(prefix + id);
+    }
 
     function removeAssociation(fullPath) {
         localStorage.removeItem(prefix + fullPath);
+        localStorage.removeItem(prefix + id);
     }
     
     function qualifyLink(link) {
@@ -290,5 +296,6 @@ var PhoneGapBuild = function () {
     this.killTimers = killTimers;
     this.qualifyLink = qualifyLink;
     this.getQRCode = getQRCode;
+    this.getLocalPathForId = getLocalPathForId;
 
 };
