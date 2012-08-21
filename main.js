@@ -125,13 +125,11 @@ define(function (require, exports, module) {
     function handlePGMenuList(e) {
         e.preventDefault();
         togglePGMenu("close");
-        var list = "";
-        var i = 0;
-        for (i = 0; i < phonegapbuild.list.length; i++) {
-            list += phonegapbuild.list[i].title + ", ";
-        }
+        createPGListView();
 
-        window.alert(list);
+        if ($("#pg-interface").css("display") === 'none') {
+            togglePGPanelDisplay("open", "360px");
+        }
     }
 
     function updateIncompleteCount(count) {
@@ -265,6 +263,25 @@ define(function (require, exports, module) {
     function createLoginMenuItem() {
         $("#pg-menu").prepend('<li id="login-holder"><a id="pg-login" href="">Login</li>');
         $('#pg-login').click(handlePGMenuLogin);
+    }
+
+    function createPGListView() {
+        var table = '<table class="table table-bordered">' +
+                        '<tr><th>App Name</th><th>Description</th></tr>' +
+                        '{{LIST}}' +
+                    '</table>';
+
+        var list = '';
+        for (var i = 0; i < phonegapbuild.list.length; i++) {
+            list += '<tr>' +
+                        '<td>' + phonegapbuild.list[i].title + '</td>' +
+                        '<td>' + phonegapbuild.list[i].description + '</td>' +
+                    '</tr>';
+        }
+        table = table.replace('{{LIST}}', list);
+
+        $('#pg-interface-content').empty();
+        $('#pg-interface-content').append(table);
     }
 
     function createPGStatusView() {
