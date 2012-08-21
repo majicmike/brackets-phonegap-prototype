@@ -362,7 +362,7 @@ define(function (require, exports, module) {
         subtable += '</table>';
 
         $("#pg-project-title").html(projectTitleLink);
-        $("#pg-project-description").text(project.description);
+        $("#pg-project-description").text(project.description || "");
         $("#pg-project-status").html(subtable);
         $("#pg-project-download").html('<a href="' + downloadUrl + '" target="_blank">Download</a>');
 
