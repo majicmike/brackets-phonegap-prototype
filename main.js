@@ -271,6 +271,7 @@ define(function (require, exports, module) {
             '<tr><th>Title</th><td id="pg-project-title">Loading <i class="icon-cog status-indicator"></i></td></tr>' +
             '<tr><th>Description</th><td id="pg-project-description">Loading <i class="icon-cog status-indicator"></i></td></tr>' +
             '<tr><th>Project Status</th><td id="pg-project-status">Loading <i class="icon-cog status-indicator"></i></td></tr>' +
+            '<tr><th>Download Page</th><td id="pg-project-download">Download Unavailable</td></tr>' +
             '</table>';
         $('#pg-interface-content').empty();
         $('#pg-interface-content').append(table);
@@ -344,7 +345,7 @@ define(function (require, exports, module) {
     function handlePGStatusResponse(e) {
         var project = e.detail;
         var propertyname;
-
+        var downloadUrl = 'http://build.phonegap.com/apps/' + project.id + '/install/?qr_key=' + phonegapbuild.token;
         var subtable = '<table class="condensed-table">';
 
         for (propertyname in project.status) {
@@ -357,6 +358,7 @@ define(function (require, exports, module) {
         $("#pg-project-title").text(project.title);
         $("#pg-project-description").text(project.description);
         $("#pg-project-status").html(subtable);
+        $("#pg-project-download").html('<a href="' + downloadUrl + '" target="_blank">Download</a>');
 
         if (project.complete === true) {
             setMenuToAssociated();
