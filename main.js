@@ -266,8 +266,27 @@ define(function (require, exports, module) {
     }
 
     function createPGListView() {
+        function createLinkForId(id) {
+            var localPath = phonegapbuild.getLocalPathForId(id);
+            if (localPath) {
+                return '<a id="pg-open-project-' + id + '" href="">Open Project</a>';
+            } else {
+                return '';
+            }
+        }
+        function createCallback(id) {
+            return function () {
+                var localPath = phonegapbuild.getLocalPathForId(id);
+                if (localPath) {
+                    return ProjectManager.openProject(localPath);
+                } else {
+                    return null;
+                }
+            };
+        }
+        
         var table = '<table class="table table-bordered">' +
-                        '<tr><th>App Name</th><th>Description</th></tr>' +
+                        '<tr><th>App Name</th><th>Description</th><th></th></tr>' +
                         '{{LIST}}' +
                     '</table>';
 
@@ -276,9 +295,18 @@ define(function (require, exports, module) {
             list += '<tr>' +
                         '<td>' + phonegapbuild.list[i].title + '</td>' +
                         '<td>' + phonegapbuild.list[i].description + '</td>' +
+                        '<td>' + createLinkForId(phonegapbuild.list[i].id) + '</td>' +
                     '</tr>';
         }
         table = table.replace('{{LIST}}', list);
+        
+        var elt;
+        for (var i = 0; i < phonegapbuild.list.length; i++) {
+            elt = $('#pg-open-project-' + phonegapbuild.list[i].id);
+            if (elt) {
+                elt.click(createCallback(phonegapbuild.list[i].id));
+            }
+        }
 
         $('#pg-interface-content').empty();
         $('#pg-interface-content').append(table);
@@ -530,15 +558,7 @@ define(function (require, exports, module) {
             checkAssociation();
         }
     }
-    
-    function openProjectForId(id) {
-        var localPath = phonegapbuild.getLocalPathForId(id);
-        if (localPath) {
-            return ProjectManager.openProject(localPath);
-        } else {
-            return null;
-        }
-    }
+
 
     CommandManager.register("Associate with PhoneGap Build", PG_PROJECT_ASSOCIATION, handlePGAssociate);
 
