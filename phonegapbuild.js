@@ -152,8 +152,11 @@ var PhoneGapBuild = function () {
     }
 
     function removeAssociation(fullPath) {
-        localStorage.removeItem(prefix + fullPath);
-        localStorage.removeItem(prefix + id);
+        var id = getAssociation(fullPath);
+        if (id) {
+            localStorage.removeItem(prefix + id);
+            localStorage.removeItem(prefix + fullPath);
+        }
     }
     
     function qualifyLink(link) {
