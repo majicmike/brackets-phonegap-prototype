@@ -77,6 +77,7 @@ define(function (require, exports, module) {
             }
         }
         $('#pg-interface').css("height", height);
+        $('#pg-interface').css("overflow-y", "scroll");
         EditorManager.resizeEditor();
     }
 
@@ -124,13 +125,11 @@ define(function (require, exports, module) {
     function handlePGMenuList(e) {
         e.preventDefault();
         togglePGMenu("close");
-        var list = "";
-        var i = 0;
-        for (i = 0; i < phonegapbuild.list.length; i++) {
-            list += phonegapbuild.list[i].title + ", ";
-        }
+        createPGListView();
 
-        window.alert(list);
+        if ($("#pg-interface").css("display") === 'none') {
+            togglePGPanelDisplay("open", "360px");
+        }
     }
 
     function updateIncompleteCount(count) {
@@ -266,11 +265,32 @@ define(function (require, exports, module) {
         $('#pg-login').click(handlePGMenuLogin);
     }
 
+    function createPGListView() {
+        var table = '<table class="table table-bordered">' +
+                        '<tr><th>App Name</th><th>Description</th><th></th></tr>' +
+                        '{{LIST}}' +
+                    '</table>';
+
+        var list = '';
+        for (var i = 0; i < phonegapbuild.list.length; i++) {
+            list += '<tr>' +
+                        '<td>' + phonegapbuild.list[i].title + '</td>' +
+                        '<td>' + phonegapbuild.list[i].description + '</td>' +
+                        '<td><a target="_blank" href="' + phonegapbuild.qualifyLink('/apps/' + phonegapbuild.list[i].id) + '">Project Page</a>' + '</td>' +
+                    '</tr>';
+        }
+        table = table.replace('{{LIST}}', list);
+        
+        $('#pg-interface-content').empty();
+        $('#pg-interface-content').append(table);
+    }
+
     function createPGStatusView() {
         var table = '<table class="table table-bordered">' +
             '<tr><th>Title</th><td id="pg-project-title">Loading <i class="icon-cog status-indicator"></i></td></tr>' +
             '<tr><th>Description</th><td id="pg-project-description">Loading <i class="icon-cog status-indicator"></i></td></tr>' +
             '<tr><th>Project Status</th><td id="pg-project-status">Loading <i class="icon-cog status-indicator"></i></td></tr>' +
+            '<tr><th>Download Page</th><td id="pg-project-download">Download Unavailable</td></tr>' +
             '</table>';
         $('#pg-interface-content').empty();
         $('#pg-interface-content').append(table);
@@ -345,18 +365,31 @@ define(function (require, exports, module) {
         var project = e.detail;
         var propertyname;
 
+        var projectTitleLink = '<a target="_blank" href="' +
+            phonegapbuild.qualifyLink("/apps/" + project.id) +
+            '">' + project.title + '</a>';
+
+        var downloadUrl = phonegapbuild.qualifyLink('/apps/' + project.id + '/install/?qr_key=' + phonegapbuild.token);
+
         var subtable = '<table class="condensed-table">';
 
         for (propertyname in project.status) {
             if (project.status.hasOwnProperty(propertyname)) {
-                subtable += '<tr><th>' + propertyname + '</th><td>' + project.status[propertyname] + '</td></tr>';
+                var status = project.status[propertyname];
+                // Display the QRCode for completed builds
+                if (project.download.hasOwnProperty(propertyname)) {
+                    var link = phonegapbuild.qualifyLink(project.download[propertyname]);
+                    status = '<img src="' + phonegapbuild.getQRCode(link) + '" />';
+                }
+                subtable += '<tr><th>' + propertyname + '</th><td>' + status + '</td></tr>';
             }
         }
         subtable += '</table>';
 
-        $("#pg-project-title").text(project.title);
-        $("#pg-project-description").text(project.description);
+        $("#pg-project-title").html(projectTitleLink);
+        $("#pg-project-description").text(project.description || "");
         $("#pg-project-status").html(subtable);
+        $("#pg-project-download").html('<a href="' + downloadUrl + '" target="_blank">Download</a>');
 
         if (project.complete === true) {
             setMenuToAssociated();
@@ -498,6 +531,7 @@ define(function (require, exports, module) {
             checkAssociation();
         }
     }
+
 
     CommandManager.register("Associate with PhoneGap Build", PG_PROJECT_ASSOCIATION, handlePGAssociate);
 

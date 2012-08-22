@@ -140,14 +140,27 @@ var PhoneGapBuild = function () {
 
     function setAssociation(fullPath, id) {
         localStorage.setItem(prefix + fullPath, id);
+        localStorage.setItem(prefix + id, fullPath);
     }
 
     function getAssociation(fullPath) {
         return localStorage.getItem(prefix + fullPath);
     }
+    
+    function getLocalPathForId(id) {
+        return localStorage.getItem(prefix + id);
+    }
 
     function removeAssociation(fullPath) {
-        localStorage.removeItem(prefix + fullPath);
+        var id = getAssociation(fullPath);
+        if (id) {
+            localStorage.removeItem(prefix + id);
+            localStorage.removeItem(prefix + fullPath);
+        }
+    }
+    
+    function qualifyLink(link) {
+        return URL_BASE + link;
     }
 
     function initialize() {
@@ -252,6 +265,10 @@ var PhoneGapBuild = function () {
         });
     }
 
+    function getQRCode(link) {
+        return 'https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=' + link + '&chld=L|1&choe=UTF-8';
+    }
+
     function killTimers() {
         var timer = "";
         console.log("Timer Kill has been invoked.  Beware timers. ");
@@ -280,5 +297,8 @@ var PhoneGapBuild = function () {
     this.removeAssociation = removeAssociation;
     this.getProjectStatus = getProjectStatus;
     this.killTimers = killTimers;
+    this.qualifyLink = qualifyLink;
+    this.getQRCode = getQRCode;
+    this.getLocalPathForId = getLocalPathForId;
 
 };
